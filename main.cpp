@@ -8,6 +8,7 @@
 #include "PlayerStateMachine.cpp"
 #include "EnemyStateMachine.cpp"
 #include "Tiles.hpp"
+#include "Entity.hpp"
 
 const float FPS(60.0f);
 
@@ -18,13 +19,10 @@ Camera2D camera_view = {0};
 int main() {
 	InitWindow(1280, 720, "Castro_Hung_Taino_Homework04");
   
-	std::vector<Enemy> enemies;
+
 	Player p({400, 300}, {0, 0}, 20, 300);
-	Enemy e({200, 200}, 20, 30, &p);
-	Enemy e2({600, 600},20, 30, &p);
-	//Enemy::Enemy(Vector2 position, Vector2 direction, float rad, float spd, Player p)
-  enemies.emplace_back(e);
-  enemies.emplace_back(e2);
+	Enemy e({200, 200}, 20, 30);
+	Enemy e2({600, 600},20, 30);
   
 	//Setting up camera
 	camera_view.target = {p.pos.x, p.pos.y};
@@ -44,7 +42,10 @@ int main() {
 
   Texture tile_map = LoadTexture(level.TILE_MAP.c_str());
 
-
+  std::vector<Entity*> elist = {};
+  elist.emplace_back(&e);
+  elist.emplace_back(&e2);
+  elist.emplace_back(&p);
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
 	
@@ -56,15 +57,13 @@ int main() {
 			camera_view.target = {640, 360};
 		}
 		
-
-		p.Update(delta_time);
-		e.Update(delta_time);
-		e2.Update(delta_time);
-
+    for(int x = 0; x < elist.size(); x++){
+      elist[x]->Update(delta_time);
+    }
 		BeginDrawing();
 		BeginMode2D(camera_view);
 		ClearBackground(BLACK);
-	  for(int x = 0; x < level.GRID_X_NUM; x++){
+    for(int x = 0; x < level.GRID_X_NUM; x++){
       for(int y = 0; y < level.GRID_Y_NUM; y++){
         Rectangle source = {tile_list[level.GRID[x][y]].location};
         Rectangle dest = {float(x) * 32, float(y) * 32, 32, 32};
@@ -72,24 +71,10 @@ int main() {
       }
     }
 
-		if (p.hp > 0) {
-			p.Draw();
-			if (e.hp > 0) {
-				e.Draw();
-			}
 
-			if (e2.hp > 0) {
-				e2.Draw();
-			}
-		} else if (p.hp <= 0) {
-			DrawText("You Lose!", (440), (260), 100, WHITE);
-		} else if ((e.hp <= 0) && (e2.hp <= 0)) {
-			DrawText("You Win!", (440), (260), 100, WHITE);
-		}
-  
-
-
-
+    for(int x = 0; x < elist.size(); x++){
+      elist[x]->Draw();
+    }
 		EndMode2D();
 		EndDrawing();
 	}

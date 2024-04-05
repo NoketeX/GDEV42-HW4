@@ -1,9 +1,9 @@
 #ifndef ENEMY
 #define ENEMY
 
-#include "Player.hpp"
 #include <raylib.h>
 #include "raymath.h"
+#include "Entity.hpp"
 
 //You create classes and functions here, but definitions are done outside of the header
 
@@ -49,23 +49,23 @@ public:
 	void Update(Enemy& e, float delta_time);
 };
 
-class Enemy {
+class Enemy : public Entity{
 public:
 	Vector2 pos;
   float angle = 0;
-	float r;
-	Color c;
+	float radius;
+	Color color;
 	int hp = 20;
-	float s;
+	float speed; 
   float dmgcount;
   float dmgtimer;
 
-	Enemy(Vector2 pos, float rad, float spd, Player* p); //Constructs the enemy
-  Player* player;
+	Enemy(Vector2 pos, float radius, float speed); //Constructs the enemy
+                                            
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the enemy
 	void SetState(EnemyState* new_state); //Accepts state, which changes the state of the enemy
-  void TakeDamage(int damage);
+  void TakeDamage(Entity& enemy, int damage);
 
 	EnemyWandering wandering;
 	EnemyChase chase;

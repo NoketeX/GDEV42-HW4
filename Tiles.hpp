@@ -54,4 +54,5 @@ void ConstructGrid(LevelData& level, std::ifstream& level_data){
     level.GRID.push_back(row);
   }
 }
+
 #endif

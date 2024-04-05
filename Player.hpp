@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include "raymath.h"
+#include "Entity.hpp"
 
 //You create classes and functions here, but definitions are done outside of the header
 
@@ -48,7 +49,7 @@ public:
 	void Update(Player& p, float delta_time);
 };
 
-class Player {
+class Player : public Entity{
 public:
 	Vector2 pos;
 	Vector2 d; //For direction
@@ -65,7 +66,7 @@ public:
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the player
 	void SetState(playerState* new_state); //Accepts state, which changes the state of the player
-  void TakeDamage(int damage);
+  void TakeDamage(Entity& player, int damage);
 
 	PlayerIdle idle;
 	PlayerMoving moving;
