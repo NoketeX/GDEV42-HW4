@@ -47,14 +47,7 @@ int main() {
 
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
-		for(int x = 1; x < level.GRID_X_NUM; x++){
-      for(int y = 1; y < level.GRID_Y_NUM; y++){
-        Rectangle source = {tile_list[level.GRID[x][y]].location};
-        Rectangle dest = {float(x) * 32, float(y) * 32, 32, 32};
-        DrawTexturePro(tile_map, source, dest, {0, 0}, 0.0f, WHITE);
-      }
-    }
-
+	
 		if (p.hp > 0) {
 			camera_view.target = {p.pos.x, p.pos.y};
 		} else if (p.hp <= 0) {
@@ -71,6 +64,13 @@ int main() {
 		BeginDrawing();
 		BeginMode2D(camera_view);
 		ClearBackground(BLACK);
+	  for(int x = 1; x < level.GRID_X_NUM; x++){
+      for(int y = 1; y < level.GRID_Y_NUM; y++){
+        Rectangle source = {tile_list[level.GRID[x][y]].location};
+        Rectangle dest = {float(x) * 32, float(y) * 32, 32, 32};
+        DrawTexturePro(tile_map, source, dest, {0, 0}, 0.0f, WHITE);
+      }
+    }
 
 		if (p.hp > 0) {
 			p.Draw();
