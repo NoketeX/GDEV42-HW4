@@ -37,6 +37,7 @@ void LoadLevelData(LevelData& level, std::ifstream& level_data){
   level_data.ignore(256, '\n');
   level_data.ignore(4, '\n');
   level_data >> level.GRID_X_NUM >> level.GRID_Y_NUM;
+  level_data.ignore(256, '\n');
 }
 
 // Takes a file, for every row from when this is called

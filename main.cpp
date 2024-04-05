@@ -64,8 +64,8 @@ int main() {
 		BeginDrawing();
 		BeginMode2D(camera_view);
 		ClearBackground(BLACK);
-	  for(int x = 1; x < level.GRID_X_NUM; x++){
-      for(int y = 1; y < level.GRID_Y_NUM; y++){
+	  for(int x = 0; x < level.GRID_X_NUM; x++){
+      for(int y = 0; y < level.GRID_Y_NUM; y++){
         Rectangle source = {tile_list[level.GRID[x][y]].location};
         Rectangle dest = {float(x) * 32, float(y) * 32, 32, 32};
         DrawTexturePro(tile_map, source, dest, {0, 0}, 0.0f, WHITE);
