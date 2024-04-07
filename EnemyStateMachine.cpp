@@ -11,10 +11,10 @@ void Enemy::Update(float delta_time) {
 }
 
 void Enemy::Draw() { 
-  DrawRectanglePro({pos.x + 20, pos.y + 20, 40, 40}, {20, 20}, angle * 180/M_PI, c);
-	DrawCircleLines(pos.x+20, pos.y+20, 60, RED); // Attack
-	DrawCircleLines(pos.x+20, pos.y+20, 100, BLUE); // Detection 
-	DrawCircleLines(pos.x+20, pos.y+20, 180, GREEN); // Aggro
+  DrawRectanglePro({pos.x + 20, pos.y + 20, 40, 40}, {20, 20}, angle * 180/M_PI, color);
+	DrawCircleLines(pos.x+20, pos.y+20, attack_rng, RED); // Attack
+	DrawCircleLines(pos.x+20, pos.y+20, detect_rng, BLUE); // Detection 
+	DrawCircleLines(pos.x+20, pos.y+20, aggro_rng, GREEN); // Aggro
 }
 // https://www.youtube.com/watch?v=b6OvrRbGU68
 
@@ -25,23 +25,28 @@ void Enemy::SetState(EnemyState* new_state) { //We can define things outside of 
 	current_state->Enter(*this);
 } 
 
-void Enemy::TakeDamage(Entity& e, int damage){
-  e.hp -= damage;  
-  std::cout << e.hp;
+void Enemy::TakeDamage(Entity* e, int damage){
+  e->hp -= damage;  
+  std::cout << e->hp;
+}
+void Enemy::DealDamage(Entity* p, int damage){
+  p->TakeDamage(p, damage);  
+  std::cout << p->hp;
 }
 
 //Defining the enemy constructor
 
-Enemy::Enemy(Vector2 position, float spd, float rad) {
+Enemy::Enemy(Vector2 position, float spd, float rad, Entity* p) {
 	pos = position;
 	speed = spd;
 	radius = rad;
+  player = p;
 	SetState(&wandering);
 }
 
 //Editing the states of the Enemy
 void EnemyWandering::Enter(Enemy& e) {
-	e.c = PINK;
+	e.color = PINK;
   e.angle = 0;
   counter = 0;
   randx = GetRandomValue(-20, 20);
@@ -52,14 +57,14 @@ void EnemyWandering::Update(Enemy& e, float delta_time){
   counter += delta_time;  
   // take damage and invincible; 
 
-
   e.dmgtimer -= delta_time;
   // check for damage
+
 }
 
 void EnemyChase::Enter(Enemy& e) {
-	e.c = YELLOW;
-  e.s = 10;
+	e.color = YELLOW;
+  e.speed = 10;
 }
 
 void EnemyChase::Update(Enemy& e, float delta_time) {
@@ -77,7 +82,7 @@ void EnemyChase::Update(Enemy& e, float delta_time) {
 
 //Enemy is preparing to attack
 void EnemyReady::Enter(Enemy& e) {
-	e.c = ORANGE;
+	e.color = ORANGE;
 	counter = 0.500f;
 }
 
@@ -90,14 +95,11 @@ void EnemyReady::Update(Enemy& e, float delta_time) {
 
   e.dmgtimer -= delta_time; // damage timer
   // Player position Collide with enemy and damage timer; (if they can take damage)
-
-
-
 }
 
 void EnemyAttack::Enter(Enemy& e) {
-	e.c = RED;
-  e.s = 30;
+	e.color = RED;
+  e.speed = 30;
   counter = 0.170;
 }
 

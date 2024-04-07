@@ -21,8 +21,9 @@ int main() {
   
 
 	Player p({400, 300}, {0, 0}, 20, 300);
-	Enemy e({200, 200}, 20, 30);
-	Enemy e2({600, 600},20, 30);
+  Player& player = p;
+	Enemy e({200, 200}, 20, 30, &p);
+	Enemy e2({600, 600},20, 30, &p);
   
 	//Setting up camera
 	camera_view.target = {p.pos.x, p.pos.y};
@@ -33,9 +34,10 @@ int main() {
   std::ifstream level_data("level_data.txt");
   LoadLevelData(level, level_data);
   ConstructGrid(level, level_data);
+
   // Make it so this is declared inside the TXT file;
   Tile tile_list[4];
-  tile_list[0] = {{0, 0, 32, 32}, false};
+  tile_list[0] = {{0, 0, 32, 32}, true};
   tile_list[1] = {{64, 0, 32, 32}, false};
   tile_list[2] = {{128, 0, 32, 32}, false};
   tile_list[3] = {{64, 32, 32, 32}, false};
@@ -45,7 +47,18 @@ int main() {
   std::vector<Entity*> elist = {};
   elist.emplace_back(&e);
   elist.emplace_back(&e2);
-  elist.emplace_back(&p);
+  elist.emplace_back(&player);
+
+  std::vector<Rectangle> walls;
+  for(int x = 0; x < level.GRID_X_NUM; x++){
+    for(int y = 0; y < level.GRID_Y_NUM; y++){
+      if(tile_list[level.GRID[x][y]].has_collision == true){
+        Rectangle wall = {float(x) * 32, float(y) * 32, 32, 32};
+        walls.emplace_back(wall);
+      }
+    }
+  }
+
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
 	
@@ -56,11 +69,14 @@ int main() {
 		} else if ((e.hp <= 0) && (e2.hp <= 0)) {
 			camera_view.target = {640, 360};
 		}
-		
+	
+    // Here goes all the Update Logic
+    player.Update(delta_time);
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Update(delta_time);
     }
-		BeginDrawing();
+
+    BeginDrawing();
 		BeginMode2D(camera_view);
 		ClearBackground(BLACK);
     for(int x = 0; x < level.GRID_X_NUM; x++){
@@ -71,10 +87,15 @@ int main() {
       }
     }
 
+    for(int x = 0; x < walls.size(); x++){
+      DrawRectangleRec(walls[x], RED);
+    }
 
+    p.Draw();
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Draw();
     }
+
 		EndMode2D();
 		EndDrawing();
 	}

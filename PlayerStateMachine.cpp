@@ -10,8 +10,8 @@ void Player::Update(float delta_time) { //We can define things outside of the cl
 }
 
 void Player::Draw() { 
-	DrawCircleV(pos, r, c);
-  DrawCircleLines(pos.x, pos.y, dmgrng, PURPLE);
+	DrawCircleV(pos, radius, color);
+  DrawCircleLines(pos.x, pos.y, dmg_rng, PURPLE);
 
   DrawText(TextFormat("%d", hp), pos.x-500, pos.y-300, 50, WHITE);
 }
@@ -30,15 +30,15 @@ void Player::TakeDamage(Entity& entity, int damage){
 //Defining the player constructor
 Player::Player(Vector2 position, Vector2 direction, float rad, float spd) {
 	pos = position;
-	d = direction;
-	r = rad;
-	s = spd;
+	direction = direction;
+	radius = rad;
+	speed = spd;
 	SetState(&idle);
 }
 
 //Defining the enter function of the idle state
 void PlayerIdle::Enter(Player& p) { //Set color, set cooldown timer, etc...; Only called once when entering the state
-	p.c = BLUE;
+	p.color = BLUE;
 }
 
 //Defining the update function of the idle state
@@ -61,7 +61,7 @@ void PlayerIdle::Update(Player& p, float delta_time) { //Set color, set cooldown
 
 //Defining the enter function of the moving state
 void PlayerMoving::Enter(Player& p) {
-	p.c = YELLOW;
+	p.color = YELLOW;
 }
 
 //Defining the update function of the moving state
@@ -69,23 +69,23 @@ void PlayerMoving::Update(Player& p, float delta_time) { //Set color, set cooldo
 
 	if (p.hp > 0) {
 		if (IsKeyDown(KEY_W)) {
-			p.d.y = -1;
-			p.pos.y += (p.s * p.d.y)  * delta_time;
+			p.direction.y = -1;
+			p.pos.y += (p.speed * p.direction.y)  * delta_time;
 		}
 
 		if (IsKeyDown(KEY_S)) {
-			p.d.y = 1;
-			p.pos.y += (p.s * p.d.y) * delta_time;
+			p.direction.y = 1;
+			p.pos.y += (p.speed * p.direction.y) * delta_time;
 		}
 
 		if (IsKeyDown(KEY_A)) {
-			p.d.x = -1;
-			p.pos.x += (p.s * p.d.x) * delta_time;
+			p.direction.x = -1;
+			p.pos.x += (p.speed * p.direction.x) * delta_time;
 		}
 
 		if (IsKeyDown(KEY_D)) {
-			p.d.x = 1;
-			p.pos.x += (p.s * p.d.x) * delta_time;
+			p.direction.x = 1;
+			p.pos.x += (p.speed * p.direction.x) * delta_time;
 		}
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
@@ -98,11 +98,11 @@ void PlayerMoving::Update(Player& p, float delta_time) { //Set color, set cooldo
 
 		//Setting direction to 0 when their respective directional keys are not being pressed
 		if (!IsKeyDown(KEY_A) && !IsKeyDown(KEY_D)) {
-			p.d.x = 0;
+			p.direction.x = 0;
 		}
 
 		if (!IsKeyDown(KEY_W) && !IsKeyDown(KEY_S)) {
-			p.d.y = 0;
+			p.direction.y = 0;
 		}
 
 		if (!IsKeyDown(KEY_W) && !IsKeyDown(KEY_A) && !IsKeyDown(KEY_S) && !IsKeyDown(KEY_D)) {
@@ -110,20 +110,18 @@ void PlayerMoving::Update(Player& p, float delta_time) { //Set color, set cooldo
 		}
 	  p.invframes -= delta_time;
 	}
-
-	
 }
 
 //Defining the enter function of the attack state
 void PlayerAttack::Enter(Player& p) {
-	p.c = RED;
-  p.dmgrng = 60;
+	p.color = RED;
+  p.dmg_rng = 60;
 }
 
 //Defining the update function of the attack state
 void PlayerAttack::Update(Player& p, float delta_time) {
 	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-    p.dmgrng = -1;
+    p.dmg_rng = -1;
 		p.SetState(&p.idle);
 	}
   p.invframes -= delta_time;
@@ -131,7 +129,7 @@ void PlayerAttack::Update(Player& p, float delta_time) {
 
 //Defining the enter function of the block state
 void PlayerBlock::Enter(Player& p) {
-	p.c = PURPLE;
+	p.color = PURPLE;
 }
 
 //Defining the update function of the block state
@@ -144,7 +142,7 @@ void PlayerBlock::Update(Player& p, float delta_time) {
 
 //Defining the enter function of the dodge state
 void PlayerDodge::Enter(Player& p) {
-	p.c = ORANGE;
+	p.color = ORANGE;
 	counter = 0.170;
 }
 
@@ -153,8 +151,8 @@ void PlayerDodge::Update(Player& p, float delta_time) {
 	counter -= delta_time;
 
 	//Essentially: Takes the direction where the player was headed previously, makes them move in that direction twice as fast during the duration of the counter
-	p.pos.x += ((p.s * p.d.x) * 2) * delta_time;
-	p.pos.y += ((p.s * p.d.y) * 2) * delta_time;
+	p.pos.x += ((p.speed * p.direction.x) * 2) * delta_time;
+	p.pos.y += ((p.speed * p.direction.y) * 2) * delta_time;
 
   p.invframes -= delta_time;
 	if (counter <= 0) {

@@ -52,14 +52,13 @@ public:
 class Player : public Entity{
 public:
 	Vector2 pos;
-	Vector2 d; //For direction
-	float r;
-	Color c;
+	Vector2 direction; //For direction
+	float radius;
+	Color color;
 	int hp = 20;
   float invframes;
-  float dmgrng = -1;
-
-	float s;
+  float dmg_rng = -1;
+	float speed;
 
 	Player(Vector2 pos, Vector2 direction, float rad, float spd); //Constructs the player
 

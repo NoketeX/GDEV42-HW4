@@ -57,15 +57,23 @@ public:
 	Color color;
 	int hp = 20;
 	float speed; 
+
   float dmgcount;
   float dmgtimer;
 
-	Enemy(Vector2 pos, float radius, float speed); //Constructs the enemy
+  int aggro_rng = 160;
+  int detect_rng = 100;
+  int attack_rng = 60;
+
+  Entity* player;
+
+	Enemy(Vector2 pos, float radius, float speed, Entity* player); //Constructs the enemy
                                             
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the enemy
 	void SetState(EnemyState* new_state); //Accepts state, which changes the state of the enemy
-  void TakeDamage(Entity& enemy, int damage);
+  void TakeDamage(Entity* e, int damage);
+  void DealDamage(Entity* p, int damage);
 
 	EnemyWandering wandering;
 	EnemyChase chase;
