@@ -4,10 +4,11 @@
 #include <raylib.h>
 #include "raymath.h"
 #include <vector>
+#include <memory>
 
 #include "PlayerStateMachine.cpp"
 #include "EnemyStateMachine.cpp"
-#include "Tiles.hpp"
+#include "Level.hpp"
 #include "Entity.hpp"
 
 const float FPS(60.0f);
@@ -19,38 +20,42 @@ Camera2D camera_view = {0};
 int main() {
 	InitWindow(1280, 720, "Castro_Hung_Taino_Homework04");
   
-	Player p(20, {400, 300}, {0, 0}, 20, 300);
-  Player& player = p;
-	Enemy e(5, {200, 200}, 20, 30, &p);
-	Enemy e2(5, {600, 600},20, 30, &p);
-  
-	//Setting up camera
-	camera_view.target = {p.pos.x, p.pos.y};
-	camera_view.offset = {1280/2, 720/2};
-	camera_view.zoom = 1.0f;
-  
   LevelData level;
   std::ifstream level_data("level_data.txt");
   LoadLevelData(level, level_data);
   ConstructGrid(level, level_data);
 
-  // Make it so this is declared inside the TXT file;
+  // Construct tile_list
   Tile tile_list[level.NUM_TILES];
   for(int x  = 0; x < level.NUM_TILES; x++){
     tile_list[x] = LoadTile(level_data);
-    std::cout << tile_list[x].has_collision;
   }
 
+  // Construct the Player and make Reference For Entity List
+  Player p = {0, {0,0}, {0,0}, 0.0f, 0.0f}; 
+  Player &player = p;
+
+
+  // Make the Entity List
+  std::vector<Entity*> elist = {};
+  for(int x = 0; x < level.NUM_ENEMIES; x++){
+    Enemy enemy = LoadEnemy(level_data, &player);
+    Enemy* e = new Enemy(enemy.hp, enemy.pos, enemy.speed, enemy.radius, enemy.player);
+    std::cout << e->pos.x << std::endl;
+    elist.emplace_back(e);
+  }
+
+  // Load the Player's Values
+  Player pp = LoadPlayer(level_data); 
+  p = pp; 
+
+  // Load Tilemap
   Texture tile_map = LoadTexture(level.TILE_MAP.c_str());
 
-  std::vector<Entity*> elist = {};
-  elist.emplace_back(&e);
-  elist.emplace_back(&e2);
-
+  // Determine Walls
   std::vector<Rectangle> walls;
   for(int x = 0; x < level.GRID_X_NUM; x++){
     for(int y = 0; y < level.GRID_Y_NUM; y++){
-
       if(tile_list[level.GRID[x][y]].has_collision == true){
         Rectangle wall = {float(x) * 32, float(y) * 32, 32, 32};
         walls.emplace_back(wall);
@@ -58,14 +63,20 @@ int main() {
     }
   }
 
+  //Setting up camera
+	camera_view.target = {player.pos.x, player.pos.y};
+	camera_view.offset = {1280/2, 720/2};
+	camera_view.zoom = 1.0f;
+ 
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
-    
-		if (p.hp > 0) {
-			camera_view.target = {p.pos.x, p.pos.y};
-		} else if (p.hp <= 0) {
+   
+    // Logic if we Win
+		if (player.hp > 0) {
+			camera_view.target = {player.pos.x, player.pos.y};
+		} else if (player.hp <= 0) {
 			camera_view.target = {640, 360};
-		} else if ((e.hp <= 0) && (e2.hp <= 0)) {
+		} else if (elist.size() == 0) {
 			camera_view.target = {640, 360};
 		}
     
@@ -105,7 +116,7 @@ int main() {
       DrawRectangleRec(walls[x], RED);
     }
 
-    p.Draw();
+    player.Draw();
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Draw();
     }
