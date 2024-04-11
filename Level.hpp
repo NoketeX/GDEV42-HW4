@@ -29,21 +29,21 @@ struct LevelData {
 };
 
 // Loads the level LevelData Itself and reads the level_data file
+// Would include: Tile_Map, Num_Tiles, Num_Enemies, GridXGridY
 void LoadLevelData(LevelData& level, std::ifstream& level_data){
-  // Here comes the formatting of the level_data; 
-  // This should include: Enemy Starting Positions - 3 Enemies Must Exist
-  // Player's Starting Positions
-  // Would be nice if we can determine what tiles are impassable;
   level_data.ignore(10, '\n');
   level_data >> level.TILE_MAP;
   level_data.ignore(256, '\n');
+  
   level_data.ignore(10, '\n');
   level_data >> level.NUM_TILES;
   level_data.ignore(256, '\n');
+  
   level_data.ignore(11, '\n');
   level_data >> level.NUM_ENEMIES;
   level_data.ignore(256, '\n');
-  level_data.ignore(4, '\n');
+  
+  level_data.ignore(4, '\n'); 
   level_data >> level.GRID_X_NUM >> level.GRID_Y_NUM;
   level_data.ignore(256, '\n');
 }
@@ -60,18 +60,21 @@ void ConstructGrid(LevelData& level, std::ifstream& level_data){
       row.push_back(number);
     }
     level.GRID.push_back(row);
+    // Empty space, breaks and goes into newline
     if(line.empty()){  
       break;
     }
   }
 }
 
+// Loads the Tiles
 Tile LoadTile(std::ifstream& level_data){
   level_data.ignore(6, '\n');
   Rectangle rect;
   std::string collidable;
   bool collide = false;
   level_data >> rect.x >> rect.y >> rect.width >> rect.height >> collidable;
+  // To support booleans from std::string, tried Char* but would not work
   if(collidable == "true"){
     collide = true;
   }
@@ -106,4 +109,5 @@ Player LoadPlayer(std::istream& level_data){
   level_data.ignore(256, '\n');
   return player;
 }
+
 #endif

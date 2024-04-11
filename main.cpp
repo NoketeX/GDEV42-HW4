@@ -12,7 +12,6 @@
 #include "Entity.hpp"
 
 const float FPS(60.0f);
-
 int camType;
 
 Camera2D camera_view = {0};
@@ -91,14 +90,31 @@ int main() {
     for(int x = 0; x < elist.size(); x++){
       Rectangle enemy = {elist[x]->pos.x, elist[x]->pos.y, 40, 40};
       if(CheckCollisionCircleRec(player.pos, player.radius, enemy)){
+        ;
       }
     }
 
     // Walls Collisions
     for(int x = 0; x < walls.size(); x++){
-      if(CheckCollisionCircleRec(player.pos, player.radius, walls[x])){
-        continue;
-      }
+      // Make this a for loop of Enemies 
+      /* // Checks if the player is colliding, checks if it's to the right, left, under, above */
+      /* bool collided = !(player.pos.x > walls[x].pos.x + walls[x].size.x || */
+      /*             player.pos.x + player.size.x < walls[x].x || */
+      /*             player.pos.y > walls[x].position.y + walls[x].size.y || */
+      /*             player.pos.y + player.size.y < walls[x].y); */
+      /* Vector2 prev_pos = Vector2Subtract(pPtr->position, Vector2Scale(pPtr->velocity, TIMESTEP)); */
+      /* bool above = (prev_pos.y + player.size.y <= walls[x].y); */
+      /* bool left = (prev_pos.x + player.size.x <= walls[x].x); */
+      /* if(collided){ */
+      /*   if(above || !above){ */
+      /*     player.pos.y = player.pos.y - player.direction.y * player.speed * delta_time; */
+      /*     player.direction.y = 0; */
+      /*   } */
+      /*   if(left || !left){ */
+      /*     player.pos.x = player.pos.x  - player.direction.x * player.speed * delta_time; */
+      /*     player.direction.x = 0; */
+      /*   } */
+      /* } */
     }
 
     BeginDrawing();
