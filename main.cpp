@@ -19,11 +19,10 @@ Camera2D camera_view = {0};
 int main() {
 	InitWindow(1280, 720, "Castro_Hung_Taino_Homework04");
   
-
-	Player p({400, 300}, {0, 0}, 20, 300);
+	Player p(20, {400, 300}, {0, 0}, 20, 300);
   Player& player = p;
-	Enemy e({200, 200}, 20, 30, &p);
-	Enemy e2({600, 600},20, 30, &p);
+	Enemy e(5, {200, 200}, 20, 30, &p);
+	Enemy e2(5, {600, 600},20, 30, &p);
   
 	//Setting up camera
 	camera_view.target = {p.pos.x, p.pos.y};
@@ -47,7 +46,6 @@ int main() {
   std::vector<Entity*> elist = {};
   elist.emplace_back(&e);
   elist.emplace_back(&e2);
-  elist.emplace_back(&player);
 
   std::vector<Rectangle> walls;
   for(int x = 0; x < level.GRID_X_NUM; x++){
@@ -61,7 +59,7 @@ int main() {
 
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
-	
+    
 		if (p.hp > 0) {
 			camera_view.target = {p.pos.x, p.pos.y};
 		} else if (p.hp <= 0) {
@@ -69,11 +67,18 @@ int main() {
 		} else if ((e.hp <= 0) && (e2.hp <= 0)) {
 			camera_view.target = {640, 360};
 		}
-	
+    
     // Here goes all the Update Logic
     player.Update(delta_time);
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Update(delta_time);
+    }
+
+    for(int x = 0; x < walls.size(); x++){
+      if(CheckCollisionCircleRec(player.pos, player.radius, walls[x])){
+        std::cout << "WOOO";
+      }
+     
     }
 
     BeginDrawing();

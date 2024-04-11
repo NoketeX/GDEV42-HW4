@@ -28,8 +28,9 @@ void Player::TakeDamage(Entity& entity, int damage){
 }
 
 //Defining the player constructor
-Player::Player(Vector2 position, Vector2 direction, float rad, float spd) {
-	pos = position;
+Player::Player(int health, Vector2 position, Vector2 direction, float rad, float spd) {
+	hp = health;
+  pos = position;
 	direction = direction;
 	radius = rad;
 	speed = spd;

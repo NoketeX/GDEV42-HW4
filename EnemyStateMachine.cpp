@@ -5,7 +5,6 @@
 
 #include "Enemy.hpp"
 
-
 void Enemy::Update(float delta_time) {
 	current_state->Update(*this, delta_time);
 }
@@ -36,8 +35,9 @@ void Enemy::DealDamage(Entity* p, int damage){
 
 //Defining the enemy constructor
 
-Enemy::Enemy(Vector2 position, float spd, float rad, Entity* p) {
+Enemy::Enemy(int health, Vector2 position, float spd, float rad, Entity* p) {
 	pos = position;
+  hp = health;
 	speed = spd;
 	radius = rad;
   player = p;

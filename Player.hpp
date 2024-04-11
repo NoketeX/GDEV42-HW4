@@ -51,16 +51,11 @@ public:
 
 class Player : public Entity{
 public:
-	Vector2 pos;
-	Vector2 direction; //For direction
-	float radius;
-	Color color;
-	int hp = 20;
   float invframes;
   float dmg_rng = -1;
 	float speed;
 
-	Player(Vector2 pos, Vector2 direction, float rad, float spd); //Constructs the player
+	Player(int health, Vector2 pos, Vector2 direction, float rad, float spd); //Constructs the player
 
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the player

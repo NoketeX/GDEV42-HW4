@@ -51,7 +51,6 @@ public:
 
 class Enemy : public Entity{
 public:
-	Vector2 pos;
   float angle = 0;
 	float radius;
 	Color color;
@@ -67,7 +66,7 @@ public:
 
   Entity* player;
 
-	Enemy(Vector2 pos, float radius, float speed, Entity* player); //Constructs the enemy
+	Enemy(int health, Vector2 pos, float radius, float speed, Entity* player); //Constructs the enemy
                                             
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the enemy
