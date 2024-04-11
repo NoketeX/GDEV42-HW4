@@ -62,9 +62,7 @@ public:
 
   int aggro_rng = 160;
   int detect_rng = 100;
-  int attack_rng = 60;
-
-  Entity* player;
+  int attack_rng = 60; Entity* player;
 
 	Enemy(int health, Vector2 pos, float radius, float speed, Entity* player); //Constructs the enemy
                                             

@@ -10,7 +10,7 @@
 
 struct Tile {
   Rectangle location;
-  bool has_collision;
+  int has_collision;
 };
 
 // Level Data containing the string of the tile_map's address on the local file system
@@ -52,7 +52,23 @@ void ConstructGrid(LevelData& level, std::ifstream& level_data){
       row.push_back(number);
     }
     level.GRID.push_back(row);
+    if(line.empty()){  
+      break;
+    }
   }
 }
 
+Tile LoadTile(std::ifstream& level_data){
+  level_data.ignore(6, '\n');
+  Rectangle rect;
+  std::string collidable;
+  bool collide = false;
+  level_data >> rect.x >> rect.y >> rect.width >> rect.height >> collidable;
+  if(collidable == "true"){
+    collide = true;
+  }
+  Tile tile = {rect, collide};
+  level_data.ignore(256, '\n');
+  return tile;
+}
 #endif

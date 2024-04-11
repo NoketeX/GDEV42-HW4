@@ -35,11 +35,11 @@ int main() {
   ConstructGrid(level, level_data);
 
   // Make it so this is declared inside the TXT file;
-  Tile tile_list[4];
-  tile_list[0] = {{0, 0, 32, 32}, true};
-  tile_list[1] = {{64, 0, 32, 32}, false};
-  tile_list[2] = {{128, 0, 32, 32}, false};
-  tile_list[3] = {{64, 32, 32, 32}, false};
+  Tile tile_list[level.NUM_TILES];
+  for(int x  = 0; x < level.NUM_TILES; x++){
+    tile_list[x] = LoadTile(level_data);
+    std::cout << tile_list[x].has_collision;
+  }
 
   Texture tile_map = LoadTexture(level.TILE_MAP.c_str());
 
@@ -50,6 +50,7 @@ int main() {
   std::vector<Rectangle> walls;
   for(int x = 0; x < level.GRID_X_NUM; x++){
     for(int y = 0; y < level.GRID_Y_NUM; y++){
+
       if(tile_list[level.GRID[x][y]].has_collision == true){
         Rectangle wall = {float(x) * 32, float(y) * 32, 32, 32};
         walls.emplace_back(wall);
@@ -74,11 +75,19 @@ int main() {
       elist[x]->Update(delta_time);
     }
 
+    // COLLISION STEP
+    // Enemy Player Collisions
+    for(int x = 0; x < elist.size(); x++){
+      Rectangle enemy = {elist[x]->pos.x, elist[x]->pos.y, 40, 40};
+      if(CheckCollisionCircleRec(player.pos, player.radius, enemy)){
+      }
+    }
+
+    // Walls Collisions
     for(int x = 0; x < walls.size(); x++){
       if(CheckCollisionCircleRec(player.pos, player.radius, walls[x])){
-        std::cout << "WOOO";
+        continue;
       }
-     
     }
 
     BeginDrawing();
