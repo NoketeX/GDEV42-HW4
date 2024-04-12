@@ -67,7 +67,7 @@ int main() {
 	camera_view.offset = {1280/2, 720/2};
 	camera_view.zoom = 1.0f;
  
-    Entity* tempEntity;
+  bool win;
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
    
@@ -76,10 +76,11 @@ int main() {
 			camera_view.target = {player.pos.x, player.pos.y};
 		} else if (player.hp <= 0) {
 			camera_view.target = {640, 360};
+      win = false;
 		}
     if (elist.size() <= 0) {
 			camera_view.target = {640, 360};
-      std::cout << "YAY";
+      win = true;
 		}
     
     // Here goes all the Update Logic
@@ -87,7 +88,6 @@ int main() {
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Update(delta_time);
       if(elist[x]->hp <= 0){
-        tempEntity = elist[x];
         elist.erase(elist.begin() + x);
         elist.shrink_to_fit();
         std::cout << elist.size();
@@ -144,6 +144,13 @@ int main() {
     player.Draw();
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Draw();
+    }
+
+    if(win == true){
+      DrawText("You Win!", (440), (260), 100, WHITE);
+    }
+    else if(win == false && player.hp <= 0){
+      DrawText("You Lose!", (440), (260), 100, WHITE);
     }
 
 		EndMode2D();
