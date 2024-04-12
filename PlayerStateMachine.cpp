@@ -23,8 +23,24 @@ void Player::SetState(playerState* new_state) { //We can define things outside o
 	current_state->Enter(*this);
 }
 
-void Player::TakeDamage(Entity& entity, int damage){
-
+void Player::Damage(int damage){
+  if(current_state == &idle){
+    hp -= damage;
+  }
+  if(current_state == &moving){
+    hp -= damage;
+  }
+  if(current_state == &attack){
+    hp -= damage;
+  }
+  if(current_state == &block){
+    damage = damage / 2;
+    hp -= damage;
+  }
+  if(current_state == &dodge){
+    damage = 0;
+    hp -= damage;
+  } 
 }
 
 //Defining the player constructor

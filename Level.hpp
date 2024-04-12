@@ -84,14 +84,14 @@ Tile LoadTile(std::ifstream& level_data){
 }
 
 // Enemy hp, position, radius, speed
-Enemy LoadEnemy(std::ifstream& level_data, Entity* player){
+Enemy LoadEnemy(std::ifstream& level_data){
   level_data.ignore(7, '\n');
   int hp;
   float x; float y;
   float radius;
   float speed;
-  level_data >> hp >> x >> y >> radius >> speed;
-  Enemy enemy = {hp, {x, y}, radius, speed, player};
+  level_data >> hp >> x >> y >> speed;
+  Enemy enemy = {hp, {x, y}, speed};
   level_data.ignore(256, '\n');
   return enemy;
 }

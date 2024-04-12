@@ -3,8 +3,8 @@
 
 #include <raylib.h>
 #include "raymath.h"
-#include "Entity.hpp"
 
+#include "Entity.hpp"
 //You create classes and functions here, but definitions are done outside of the header
 
 class Enemy;
@@ -54,7 +54,6 @@ public:
   float angle = 0;
 	float radius;
 	Color color;
-	int hp = 20;
 	float speed; 
 
   float dmgcount;
@@ -62,15 +61,15 @@ public:
 
   int aggro_rng = 160;
   int detect_rng = 100;
-  int attack_rng = 60; Entity* player;
+  int attack_rng = 60; 
 
-	Enemy(int health, Vector2 pos, float radius, float speed, Entity* player); //Constructs the enemy
+  Player* player;
+	Enemy(int health, Vector2 pos, float speed); //Constructs the enemy
                                             
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the enemy
 	void SetState(EnemyState* new_state); //Accepts state, which changes the state of the enemy
-  void TakeDamage(Entity* e, int damage);
-  void DealDamage(Entity* p, int damage);
+  void Damage(int damage); 
 
 	EnemyWandering wandering;
 	EnemyChase chase;

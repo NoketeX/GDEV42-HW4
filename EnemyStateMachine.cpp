@@ -1,9 +1,12 @@
+
 #include <raylib.h>
 #include "raymath.h"
 #include <iostream>
 #include <cmath>
 
 #include "Enemy.hpp"
+#include "Player.hpp"
+
 
 void Enemy::Update(float delta_time) {
 	current_state->Update(*this, delta_time);
@@ -24,23 +27,17 @@ void Enemy::SetState(EnemyState* new_state) { //We can define things outside of 
 	current_state->Enter(*this);
 } 
 
-void Enemy::TakeDamage(Entity* e, int damage){
-  e->hp -= damage;  
-  std::cout << e->hp;
-}
-void Enemy::DealDamage(Entity* p, int damage){
-  p->TakeDamage(p, damage);  
-  std::cout << p->hp;
+void Enemy::Damage(int damage){
+  hp -= damage;  
+  std::cout << "bye";
 }
 
 //Defining the enemy constructor
 
-Enemy::Enemy(int health, Vector2 position, float spd, float rad, Entity* p) {
-	pos = position;
-  hp = health;
+Enemy::Enemy(int health, Vector2 position, float spd) {
+	hp = health;
+  pos = position;
 	speed = spd;
-	radius = rad;
-  player = p;
 	SetState(&wandering);
 }
 
@@ -55,11 +52,32 @@ void EnemyWandering::Enter(Enemy& e) {
 
 void EnemyWandering::Update(Enemy& e, float delta_time){
   counter += delta_time;  
-  // take damage and invincible; 
+  if(CheckCollisionCircleRec(e.player->pos, e.player->radius, {e.pos.x, e.pos.y, 40, 40}) && e.player->invframes <= 0){ 
+		e.player->Damage(2);
+    e.player->invframes = 0.5f;
+  }
 
   e.dmgtimer -= delta_time;
-  // check for damage
+    if(CheckCollisionCircleRec(e.player->pos, e.player->dmg_rng, {e.pos.x, e.pos.y, 40, 40}) && e.dmgtimer <= 0.0f){
+      e.Damage(20);
+      e.dmgcount += 1;
+      if(e.dmgcount == 2){
+        e.dmgtimer = 2.0f;
+        e.dmgcount = 0;
+    }
+  }
 
+  if(counter >= 1){
+    e.pos = Vector2Add(e.pos, Vector2Scale({randx, randy}, e.speed * delta_time / 2.0f));
+  } 
+  if(counter >= 3){
+    randx = GetRandomValue(-20, 20);
+    randy = GetRandomValue(-20, 20);
+    counter = 0;
+  }
+  if(CheckCollisionCircles({e.pos.x + 20, e.pos.y + 20}, 100, e.player->pos, e.player->radius)){
+    e.SetState(&e.chase);
+  }
 }
 
 void EnemyChase::Enter(Enemy& e) {
@@ -68,16 +86,30 @@ void EnemyChase::Enter(Enemy& e) {
 }
 
 void EnemyChase::Update(Enemy& e, float delta_time) {
-  // Angle for Player angle
-  // e.angle = Vector2Angle(e.player->pos,e.pos);
-  // Vector2 direction = Vector2Normalize(Vector2Subtract(e.player->pos, e.pos));
-  // e.pos = Vector2Add(e.pos, Vector2Scale(direction, (e.s * 8) * delta_time));
-
+  e.angle = Vector2Angle(e.player->pos,e.pos);
+  Vector2 direction = Vector2Normalize(Vector2Subtract(e.player->pos, e.pos));
+  e.pos = Vector2Add(e.pos, Vector2Scale(direction, (e.speed * 8) * delta_time));
+  if(CheckCollisionCircleRec(e.player->pos, e.player->radius, {e.pos.x, e.pos.y, 40, 40}) && e.player->invframes <= 0){ 
+		e.player->Damage(2);
+    e.player->invframes = 0.5f;
+  }
 
  e.dmgtimer -= delta_time;
-  // Collision betwen player and Enemy (with dmg timer check)
-  //
-  // Checks if player is in the radius for the enemy
+  if(CheckCollisionCircleRec(e.player->pos, e.player->dmg_rng, {e.pos.x, e.pos.y, 40, 40}) && e.dmgtimer <= 0.0f){
+    e.Damage(20);
+    e.dmgcount += 1;
+    if(e.dmgcount == 2){
+      e.dmgtimer = 2.0f;
+      e.dmgcount = 0;
+    }
+  }
+
+	if(CheckCollisionCircles({e.pos.x + 20, e.pos.y + 20}, 60, e.player->pos, e.player->radius)){
+		e.SetState(&e.ready);
+	}
+  if(CheckCollisionCircles({e.pos.x + 20, e.pos.y + 20}, 180, e.player->pos, e.player->radius) == false){
+    e.SetState(&e.wandering);
+  }
 }
 
 //Enemy is preparing to attack
@@ -88,13 +120,25 @@ void EnemyReady::Enter(Enemy& e) {
 
 void EnemyReady::Update(Enemy& e, float delta_time) {
 	counter -= delta_time;
-  // e.angle = Vector2Angle(e.player->pos,e.pos); - Angle towards Player
-  //
-  //Checks if collide and if player is invincible
+  e.angle = Vector2Angle(e.player->pos,e.pos);
+  if(CheckCollisionCircleRec(e.player->pos, e.player->radius, {e.pos.x, e.pos.y, 40, 40}) && e.player->invframes <= 0){ 
+		e.player->Damage(2);
+    e.player->invframes = 0.5f;
+  }
 
+  e.dmgtimer -= delta_time;
+  if(CheckCollisionCircleRec(e.player->pos, e.player->dmg_rng, {e.pos.x, e.pos.y, 40, 40}) && e.dmgtimer <= 0.0f){
+    e.Damage(20);
+    e.dmgcount += 1;
+    if(e.dmgcount == 2){
+      e.dmgtimer = 2.0f;
+      e.dmgcount = 0;
+    }
+  }
 
-  e.dmgtimer -= delta_time; // damage timer
-  // Player position Collide with enemy and damage timer; (if they can take damage)
+	if(counter<=0){
+		e.SetState(&e.attack);
+	}
 }
 
 void EnemyAttack::Enter(Enemy& e) {
@@ -104,19 +148,32 @@ void EnemyAttack::Enter(Enemy& e) {
 }
 
 void EnemyAttack::Update(Enemy& e, float delta_time) {
-  // Find the angle between player pos and enemy post, check if these are colliding, and check if player is invincible
-  // If not take damage and add invincibility for 0.3 saeconds;
-
 	counter -= delta_time;
+  e.angle = Vector2Angle(e.player->pos,e.pos);
+  if(CheckCollisionCircleRec(e.player->pos, e.player->radius, {e.pos.x, e.pos.y, 40, 40}) && e.player->invframes <= 0){ 
+		e.player->Damage(2);
+    e.player->invframes = 0.5f;
+  }
   
-  e.dmgtimer -= delta_time; // Timer for enemy doing the attack move  // Add TakeDamage
-  //
-  // Collision checking i player is colliding and also the enemy has attack rn
-
-  if(counter >= 0){ // I counter is >= 0 then it immediately dashes to the player position 
+  e.dmgtimer -= delta_time;
+  if(CheckCollisionCircleRec(e.player->pos, e.player->dmg_rng, {e.pos.x, e.pos.y, 40, 40}) && e.dmgtimer <= 0.0f){
+    e.Damage(20);
+    e.dmgcount += 1;
+    if(e.dmgcount == 2){
+      e.dmgtimer = 2.0f;
+      e.dmgcount = 0;
+    }
   }
 
-  else if(counter <= 0){ // If the counter or attacking reaches 0 it goes into wandering
+
+  if(counter >= 0){
+    Vector2 direction = Vector2Normalize(Vector2Subtract(e.player->pos, e.pos));
+    e.pos = Vector2Add(e.pos, Vector2Scale(direction, e.speed * 30 * delta_time));
+  }
+
+  else if(counter <= 0){
     e.SetState(&e.wandering);
   }
 }
+
+

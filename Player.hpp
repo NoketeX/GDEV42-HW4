@@ -54,13 +54,14 @@ public:
   float invframes;
   float dmg_rng = -1;
 	float speed;
+  bool hit;
 
 	Player(int health, Vector2 pos, Vector2 direction, float rad, float spd); //Constructs the player
 
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the player
 	void SetState(playerState* new_state); //Accepts state, which changes the state of the player
-  void TakeDamage(Entity& player, int damage);
+  void Damage(int damage);
 
 	PlayerIdle idle;
 	PlayerMoving moving;

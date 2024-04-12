@@ -3,7 +3,6 @@
 
 #include <raylib.h> 
 #include <raymath.h>
-
 class Entity {
   public: 
     int hp;
@@ -17,8 +16,6 @@ class Entity {
     virtual void Update(float delta_time){};
     virtual void Draw(){};
 
-    virtual void DealDamage(Entity* e, int damage){};
-    virtual void TakeDamage(Entity* e, int damage){};
+    virtual void Damage(int damage){};
 }; 
-
 #endif

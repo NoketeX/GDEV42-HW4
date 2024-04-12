@@ -38,15 +38,15 @@ int main() {
   // Make the Entity List
   std::vector<Entity*> elist = {};
   for(int x = 0; x < level.NUM_ENEMIES; x++){
-    Enemy enemy = LoadEnemy(level_data, &player);
-    Enemy* e = new Enemy(enemy.hp, enemy.pos, enemy.speed, enemy.radius, enemy.player);
-    std::cout << e->pos.x << std::endl;
+    Enemy enemy = LoadEnemy(level_data);
+    Enemy* e = new Enemy(enemy.hp, enemy.pos, enemy.speed);
+    e->player = &player;
     elist.emplace_back(e);
   }
 
   // Load the Player's Values
   Player pp = LoadPlayer(level_data); 
-  p = pp; 
+  player = pp; 
 
   // Load Tilemap
   Texture tile_map = LoadTexture(level.TILE_MAP.c_str());
@@ -67,6 +67,7 @@ int main() {
 	camera_view.offset = {1280/2, 720/2};
 	camera_view.zoom = 1.0f;
  
+    Entity* tempEntity;
 	while(!WindowShouldClose()) {
 		float delta_time = GetFrameTime();
    
@@ -75,14 +76,22 @@ int main() {
 			camera_view.target = {player.pos.x, player.pos.y};
 		} else if (player.hp <= 0) {
 			camera_view.target = {640, 360};
-		} else if (elist.size() == 0) {
+		}
+    if (elist.size() <= 0) {
 			camera_view.target = {640, 360};
+      std::cout << "YAY";
 		}
     
     // Here goes all the Update Logic
     player.Update(delta_time);
     for(int x = 0; x < elist.size(); x++){
       elist[x]->Update(delta_time);
+      if(elist[x]->hp <= 0){
+        tempEntity = elist[x];
+        elist.erase(elist.begin() + x);
+        elist.shrink_to_fit();
+        std::cout << elist.size();
+      }
     }
 
     // COLLISION STEP
