@@ -45,8 +45,7 @@ void Player::Damage(int damage){
 
 //Defining the player constructor
 Player::Player(int health, Vector2 position, Vector2 direction, float rad, float spd) {
-	hp = health;
-  pos = position;
+	hp = health; pos = position;
 	direction = direction;
 	radius = rad;
 	speed = spd;

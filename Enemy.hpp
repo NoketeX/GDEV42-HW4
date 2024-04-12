@@ -21,12 +21,10 @@ class EnemyWandering : public EnemyState {
 public:
 	float counter;
   float time;
-  float randx, randy;
 
 	void Enter(Enemy& e);
 	void Update(Enemy& e, float delta_time);
 };
-
 class EnemyChase : public EnemyState {
 public:
 	void Enter(Enemy& e);
@@ -52,9 +50,9 @@ public:
 class Enemy : public Entity{
 public:
   float angle = 0;
-	float radius;
 	Color color;
 	float speed; 
+  float randx, randy;
 
   float dmgcount;
   float dmgtimer;

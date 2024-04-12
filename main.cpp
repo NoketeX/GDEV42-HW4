@@ -1,6 +1,7 @@
 //Only detect damage at the first frame, not all frames
 //Use melee; Create circle around player when it attacks
-
+// https://www.geeksforgeeks.org/dynamic-_cast-in-cpp/
+//
 #include <raylib.h>
 #include "raymath.h"
 #include <vector>
@@ -94,36 +95,41 @@ int main() {
       }
     }
 
-    // COLLISION STEP
-    // Enemy Player Collisions
-    for(int x = 0; x < elist.size(); x++){
-      Rectangle enemy = {elist[x]->pos.x, elist[x]->pos.y, 40, 40};
-      if(CheckCollisionCircleRec(player.pos, player.radius, enemy)){
-        ;
-      }
-    }
-
     // Walls Collisions
     for(int x = 0; x < walls.size(); x++){
-      // Make this a for loop of Enemies 
-      /* // Checks if the player is colliding, checks if it's to the right, left, under, above */
-      /* bool collided = !(player.pos.x > walls[x].pos.x + walls[x].size.x || */
-      /*             player.pos.x + player.size.x < walls[x].x || */
-      /*             player.pos.y > walls[x].position.y + walls[x].size.y || */
-      /*             player.pos.y + player.size.y < walls[x].y); */
-      /* Vector2 prev_pos = Vector2Subtract(pPtr->position, Vector2Scale(pPtr->velocity, TIMESTEP)); */
-      /* bool above = (prev_pos.y + player.size.y <= walls[x].y); */
-      /* bool left = (prev_pos.x + player.size.x <= walls[x].x); */
-      /* if(collided){ */
-      /*   if(above || !above){ */
-      /*     player.pos.y = player.pos.y - player.direction.y * player.speed * delta_time; */
-      /*     player.direction.y = 0; */
-      /*   } */
-      /*   if(left || !left){ */
-      /*     player.pos.x = player.pos.x  - player.direction.x * player.speed * delta_time; */
-      /*     player.direction.x = 0; */
-      /*   } */
-      /* } */
+      // Checks if the player is colliding, checks if it's to the right, left, under, above
+      bool collided = CheckCollisionCircleRec(player.pos, player.radius, walls[x]); 
+      Vector2 prev_pos = Vector2Subtract(player.pos, Vector2Scale(Vector2Scale(player.direction, player.speed), delta_time));
+      bool above = (prev_pos.y + player.radius <= walls[x].y);
+      bool left = (prev_pos.x + player.radius <= walls[x].x);
+      if(collided){
+        if(above || !above){
+          player.pos.y = player.pos.y - player.direction.y * player.speed * delta_time;
+          player.direction.y = 0;
+        }
+        if(left || !left){
+          player.pos.x = player.pos.x  - player.direction.x * player.speed * delta_time;
+          player.direction.x = 0;
+        }
+      }
+
+      // ENEMY WALL COLLISIONS  
+      for(int y = 0; y < elist.size(); y++){
+        Enemy* enemy = dynamic_cast<Enemy*>(elist[y]);
+        Rectangle e = {enemy->pos.x, enemy->pos.y, 40, 40};
+        collided = CheckCollisionRecs(e, walls[x]);
+        prev_pos = Vector2Subtract(elist[y]->pos, Vector2Scale(Vector2Scale({enemy->randx, enemy->randy}, enemy->speed), delta_time / 2.0f));
+        above = (prev_pos.y + 40 <= walls[x].y);
+        left = (prev_pos.x + 40 <= walls[x].x);
+        if(collided){
+          if(above || !above){
+            enemy->pos.y = enemy->pos.y - enemy->randy * enemy->speed * delta_time;
+          }
+          if(left || !left){
+            enemy->pos.x = enemy->pos.x - enemy->randx * enemy->speed * delta_time;
+          }
+        }
+      }
     }
 
     BeginDrawing();

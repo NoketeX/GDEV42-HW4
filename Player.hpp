@@ -55,8 +55,7 @@ public:
   float dmg_rng = -1;
 	float speed;
   bool hit;
-
-	Player(int health, Vector2 pos, Vector2 direction, float rad, float spd); //Constructs the player
+  Player(int health, Vector2 pos, Vector2 direction, float rad, float spd); //Constructs the player
 
 	void Update(float delta_time); //Updates player per frame
 	void Draw(); //Draws the player
